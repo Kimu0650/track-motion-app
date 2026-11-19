@@ -339,18 +339,18 @@ if uploaded_file is not None:
         "right_hip_deg": "右股関節角度 (度)",
         "left_elbow_deg": "左肘角度 (度)",
         "right_elbow_deg": "右肘角度 (度)",
-        "hip_center_y": "腰中心の高さ（正規化Y座標・小が上）",
-        "head_y": "頭の高さ（鼻Y座標・小が上）",
+        "hip_center_y": "腰の高さ（大きいほど上・ジャンプで山になる）",
+        "head_y": "頭の高さ（大きいほど上・ジャンプで山になる）",
     }
 
     if view_mode == "2D時系列グラフ（角度・上下動）":
         st.markdown(
-            "- **横軸（経過時間・秒）：** 動画が始まってからの時間です。右へ進むほど動きの順番が進みます。\n"
-            "- **縦軸（角度・高さ）：** 関節の曲がり具合（数値が小さい＝深く曲がる、大きい＝伸びる）や、体の高さの目安です。波が大きいほど上下に大きく動いています。"
+            "- **横軸（経過時間・秒）：** 動画が始まってからの時間です。右へ進むほど動きの順番が進みます。\\n"
+            "- **縦軸（角度・高さ）：** 関節角度はそのまま（小さい＝深く曲がる、大きい＝伸びる）、頭と腰の高さは**大きいほど上**に表示しています。"
         )
 
         with st.expander("データの見方ガイド（初めて見る人向け）"):
-            st.write("1. まずは **膝角度** や **腰中心の高さ** など、1〜2項目だけを選んで見てみましょう。")
+            st.write("1. まずは **膝角度** や **腰の高さ**・**頭の高さ** など、1〜2項目だけを選んで見てみましょう。")
             st.write("2. グラフの山や谷（大きく下がった・上がった瞬間）の **秒数** を見て、上の解析動画の同じ秒数と動きを比べてみてください。")
             st.write("3. 撮影する角度や距離が変わると数値の見え方も変わるため、まずは「自分の前回の動画」や「動きが良かった動画」と見比べるのがおすすめです。")
 
@@ -364,16 +364,17 @@ if uploaded_file is not None:
         if selected_metrics and not plot_df.empty:
             fig, ax = plt.subplots(figsize=(10, 4.5))
             for col in selected_metrics:
+                y_vals = 1.0 - plot_df[col] if col in ("hip_center_y", "head_y") else plot_df[col]
                 ax.plot(
                     plot_df["time_sec"],
-                    plot_df[col],
+                    y_vals,
                     marker="o",
                     markersize=2.5,
                     linewidth=1.5,
                     label=metric_labels[col],
                 )
             ax.set_xlabel("経過時間（秒）")
-            ax.set_ylabel("角度（度）／高さの目安")
+            ax.set_ylabel("角度（度）／高さの目安（大＝上）")
             ax.set_title("動作解析 時系列グラフ")
             ax.grid(True, alpha=0.3)
             ax.legend()
