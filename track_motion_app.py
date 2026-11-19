@@ -19,29 +19,6 @@ st.set_page_config(page_title="陸上動作解析アプリ", layout="wide")
 st.title("🏃‍♂️ 陸上競技 動作解析＆グラフ可視化ツール")
 st.caption("動画をアップロードすると関節角度・動きを解析し、解析動画の再生・2D/3D可視化・CSVダウンロードができます。")
 
-# --- 部員限定アクセス制御 ---
-EXPECTED_PASSCODE = os.environ.get("APP_PASSCODE", "4592026")
-
-if "authenticated" not in st.session_state:
-    st.session_state.authenticated = False
-
-if not st.session_state.authenticated:
-    st.subheader("🔒 部員限定ログイン")
-    st.write("陸上競技部の部員に共有された合言葉を入力してください。")
-    entered_code = st.text_input("合言葉", type="password")
-    if st.button("入室する"):
-        if entered_code == EXPECTED_PASSCODE:
-            st.session_state.authenticated = True
-            st.rerun()
-        else:
-            st.error("合言葉が違います。")
-    st.stop()
-
-if st.sidebar.button("ログアウト"):
-    st.session_state.authenticated = False
-    st.rerun()
-# --- ここまで ---
-
 # MediaPipe Pose 33点の主要インデックス
 NOSE = 0
 LEFT_SHOULDER, RIGHT_SHOULDER = 11, 12
