@@ -261,6 +261,16 @@ def analyze_video(video_bytes: bytes, model_type: str, min_det_conf: float):
     return df, world_frames, annotated_video_bytes, fps, detected_frames
 
 
+# 日本語フォント設定（文字化け防止のフォールバック）
+plt.rcParams["font.sans-serif"] = [
+    "Noto Sans CJK JP",
+    "IPAexGothic",
+    "Hiragino Sans",
+    "Yu Gothic",
+    "DejaVu Sans",
+]
+plt.rcParams["axes.unicode_minus"] = False
+
 # サイドバー：解析設定
 st.sidebar.header("解析設定")
 model_type = st.sidebar.selectbox(
@@ -334,6 +344,16 @@ if uploaded_file is not None:
     }
 
     if view_mode == "2D時系列グラフ（角度・上下動）":
+        st.markdown(
+            "- **横軸（経過時間・秒）：** 動画が始まってからの時間です。右へ進むほど動きの順番が進みます。\n"
+            "- **縦軸（角度・高さ）：** 関節の曲がり具合（数値が小さい＝深く曲がる、大きい＝伸びる）や、体の高さの目安です。波が大きいほど上下に大きく動いています。"
+        )
+
+        with st.expander("データの見方ガイド（初めて見る人向け）"):
+            st.write("1. まずは **膝角度** や **腰中心の高さ** など、1〜2項目だけを選んで見てみましょう。")
+            st.write("2. グラフの山や谷（大きく下がった・上がった瞬間）の **秒数** を見て、上の解析動画の同じ秒数と動きを比べてみてください。")
+            st.write("3. 撮影する角度や距離が変わると数値の見え方も変わるため、まずは「自分の前回の動画」や「動きが良かった動画」と見比べるのがおすすめです。")
+
         selected_metrics = st.multiselect(
             "グラフに重ねて表示する項目を選択してください（複数選択可）",
             options=list(metric_labels.keys()),
@@ -352,9 +372,9 @@ if uploaded_file is not None:
                     linewidth=1.5,
                     label=metric_labels[col],
                 )
-            ax.set_xlabel("Time (sec)")
-            ax.set_ylabel("Value (deg / norm Y)")
-            ax.set_title("Motion Analysis Time Series")
+            ax.set_xlabel("経過時間（秒）")
+            ax.set_ylabel("角度（度）／高さの目安")
+            ax.set_title("動作解析 時系列グラフ")
             ax.grid(True, alpha=0.3)
             ax.legend()
             st.pyplot(fig)
